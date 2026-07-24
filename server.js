@@ -46,6 +46,12 @@ app.get('/api/gastos', (req,res) => {
 
 });
 
+//requisição para deletar gastos pelo id 
+app.delete('/api/gastos/:id', (req,res) =>{
+    db.prepare('DELETE FROM gastos WHERE id = ?').run(req.params.id);
+    res.status(204).send();
+})
+
 
 
 app.listen(PORTA, () =>{
