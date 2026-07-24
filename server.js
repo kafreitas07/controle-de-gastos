@@ -53,6 +53,27 @@ app.delete('/api/gastos/:id', (req,res) =>{
 })
 
 
+/*equisição para atualizar um gasto específico utilizando o id
+*/
+app.put('/api/gastos/:id', (req,res) =>{
+    const {descricao, valor, data, categoria_id} = req.body;
+    const {id} = req.params;
+
+    if(!descricao || !valor || !data || !categoria_id)
+        {
+            return res.status(400).json ({erro: 'Preencha todos os campos'});
+
+    }
+  const resultado = db.prepare('UPDATE gastos SET    descricao = ?, valor = ?, data = ?, categoria_id = ? WHERE id = ?').run(descricao, valor, data, categoria_id, id);
+
+    if (resultado.changes === 0) {
+        return res.status(404).json({ erro: 'Gasto não encontrado' });
+    }
+    res.json({ sucesso: true });
+    
+})
+
+
 
 app.listen(PORTA, () =>{
     console.log(`Servidor rodando na porta ${PORTA}`);
