@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Controle de Gastos</title>
     <link rel="stylesheet" href="style.css">
-    
+
 </head>
 <body>
 
     <main>
         <h1>Controle de Gastos</h1>
         <form id="formGasto">
+            <input type="hidden" id="gastoId" value="">
+
             <div>
                 <label for="descricao"> Descrição</label>
                 <input type="text" id="descricao" required>
@@ -32,8 +34,8 @@
                 <select id="categoria" required></select>
             </div>
 
-            <button type="submit"> Adicionar Gasto </button>
-          
+            <button type="submit" id="btnSalvar"> Adicionar Gasto </button>
+            <button type="button" id="btnCancelar" hidden>Cancelar Edição</button>
         </form>
 
         <h2>Gastos Lançados</h2>
