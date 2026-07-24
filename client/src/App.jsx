@@ -8,7 +8,8 @@ function App() {
   const [date, setDate] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [editingId,setEditingId] = useState(null);
-
+  const [total, setTotal] = useState(0);
+  const [byCategory, setByCategory] = useState([]);
 
 
   function loadExpenses() {
@@ -17,7 +18,14 @@ function App() {
       .then(data => setExpenses(data));
   }
 
-
+  function loadSummary() {
+    fetch('/api/resumo')
+      .then(response => response.json())
+      .then(data => {
+        setTotal(data.total);
+        setByCategory(data.byCategory);
+      });
+  }
   // recebe o gasto inteiro, inserindo os dados preenchidos em seus determinados campos
   function startEdit(expense){
     setEditingId(expense.id);
@@ -41,7 +49,12 @@ function deleteExpense(id){
   const confirmDelete = window.confirm('Excluir este gasto?');
   if(!confirmDelete) return;
   
-  fetch(`/api/gastos/${id}`, {method:'DELETE'}).then(() => loadExpenses());
+  fetch(`/api/gastos/${id}`, {method:'DELETE'})
+    .then(() => 
+    {loadExpenses();
+     loadSummary();}
+);
+
 }
 
   useEffect(() => {
@@ -50,6 +63,8 @@ function deleteExpense(id){
       .then(data => setCategories(data));
 
     loadExpenses();
+    loadSummary();
+
   }, []);
 
 function handleSubmit(event) {
@@ -77,6 +92,8 @@ function handleSubmit(event) {
   request.then(() => {
     cancelEdit();
     loadExpenses();
+    loadSummary();
+
   });
 }
 
@@ -135,10 +152,16 @@ function handleSubmit(event) {
             {editingId && (
           <button type="button" onClick={cancelEdit}>
           Cancelar Edição
-          </button>
-)}
+          </button>)}
       </form>
-
+      <h2> Resumo</h2>
+      <p>Total: R$ {total}</p>
+      <ul>
+        {byCategory.map(cat => (<li key ={cat.nome}>{cat.nome}: R$ {cat.total}
+        </li>
+        ))}
+      </ul> 
+      
       <h2>Gastos</h2>
         <ul>
         {expenses.map(exp => (
