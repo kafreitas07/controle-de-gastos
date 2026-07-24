@@ -1,12 +1,9 @@
 const express = require('express');
-const path = require('path');
 const db = require('./database');
 const app = express();
 const PORTA = 3000;
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname,'public')));
-
 
 // requisição para retornar todas as minhas categorias de gastos
 app.get('/api/categorias', (req,res) =>{
