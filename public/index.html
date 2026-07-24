@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Gastos</title>
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+
+    <main>
+        <h1>Controle de Gastos</h1>
+        <form id="formGasto">
+            <div>
+                <label for="descricao"> Descrição</label>
+                <input type="text" id="descricao" required>
+            </div>
+
+            <div>
+                <label for="valor">Valor (R$)</label>
+                <input type="number" id="valor" step="0.01" min="0.01" required>
+            </div>
+
+            <div>
+                <label for="data">Data</label>
+                <input type="date" id="data"required>
+            </div>
+
+            <div>
+                <label for="categoria">Categoria</label>
+                <select id="categoria" required></select>
+            </div>
+
+            <button type="submit"> Adicionar Gasto </button>
+          
+        </form>
+
+        <h2>Gastos Lançados</h2>
+        <ul id="listaGastos"></ul>
+
+    </main>
+    <script src="script.js"></script>
+
+</body>
+</html>
