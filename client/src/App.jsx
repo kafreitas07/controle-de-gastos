@@ -7,12 +7,42 @@ function App() {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
   const [categoryId, setCategoryId] = useState('');
+  const [editingId,setEditingId] = useState(null);
+
+
 
   function loadExpenses() {
     fetch('/api/gastos')
       .then(response => response.json())
       .then(data => setExpenses(data));
   }
+
+
+  // recebe o gasto inteiro, inserindo os dados preenchidos em seus determinados campos
+  function startEdit(expense){
+    setEditingId(expense.id);
+    setDescription(expense.descricao);
+    setAmount(expense.valor);
+    setDate(expense.data);
+    setCategoryId(expense.categoria_id);
+  }
+
+  // limpa todos os campos do formulário
+  function cancelEdit(){
+    setEditingId(null);
+    setDescription('');
+    setAmount('');
+    setDate('');
+    setCategoryId('');
+
+}
+// apaga um custo existente disparando para a API um delete
+function deleteExpense(id){
+  const confirmDelete = window.confirm('Excluir este gasto?');
+  if(!confirmDelete) return;
+  
+  fetch(`/api/gastos/${id}`, {method:'DELETE'}).then(() => loadExpenses());
+}
 
   useEffect(() => {
     fetch('/api/categorias')
@@ -22,28 +52,33 @@ function App() {
     loadExpenses();
   }, []);
 
-  function handleSubmit(event) {
-    event.preventDefault();
+function handleSubmit(event) {
+  event.preventDefault();
 
-    const newExpense = {
-      descricao: description,
-      valor: parseFloat(amount),
-      data: date,
-      categoria_id: Number(categoryId),
-    };
+  const expenseData = {
+    descricao: description,
+    valor: parseFloat(amount),
+    data: date,
+    categoria_id: Number(categoryId),
+  };
 
-    fetch('/api/gastos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newExpense),
-    }).then(() => {
-      setDescription('');
-      setAmount('');
-      setDate('');
-      setCategoryId('');
-      loadExpenses();
-    });
-  }
+  const request = editingId
+    ? fetch(`/api/gastos/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(expenseData),
+      })
+    : fetch('/api/gastos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(expenseData),
+      });
+
+  request.then(() => {
+    cancelEdit();
+    loadExpenses();
+  });
+}
 
   return (
     <div>
@@ -94,18 +129,27 @@ function App() {
           </select>
         </div>
 
-        <button type="submit">Adicionar Gasto</button>
+          <button type='submit'>
+            {editingId ? 'Salvar Edição' : 'Adicionar Gasto'}
+          </button>
+            {editingId && (
+          <button type="button" onClick={cancelEdit}>
+          Cancelar Edição
+          </button>
+)}
       </form>
 
       <h2>Gastos</h2>
-      <ul>
+        <ul>
         {expenses.map(exp => (
           <li key={exp.id}>
             {exp.descricao} - ${exp.valor} - {exp.categoria}
+            <button onClick={() => startEdit(exp)}>editar</button>
+            <button onClick={() => deleteExpense(exp.id)}>excluir</button>
           </li>
         ))}
       </ul>
-    </div>
+    </div>  
   );
 }
 
