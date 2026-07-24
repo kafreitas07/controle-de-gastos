@@ -72,6 +72,21 @@ app.put('/api/gastos/:id', (req, res) => {
 
     res.json({ sucesso: true });
 });
+// Rota que retorna o gasto total por categoria
+app.get('/api/resumo', (req, res) => {
+    const total = db.prepare('SELECT SUM(valor) AS total FROM gastos').get().total || 0;
+
+    const byCategory = db.prepare(`
+        SELECT categorias.nome, categorias.cor, SUM(gastos.valor) AS total
+        FROM gastos
+        JOIN categorias ON categorias.id = gastos.categoria_id
+        GROUP BY categorias.id
+        ORDER BY total DESC
+    `).all();
+
+    res.json({ total, byCategory });
+});
+
 
 
 app.listen(PORTA, () =>{
