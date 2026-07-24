@@ -12,6 +12,8 @@ function App() {
   const [displayedTotal, setDisplayedTotal] = useState(0);
   const [total, setTotal] = useState(0);
   const [byCategory, setByCategory] = useState([]);
+  const [error, setError] = useState(null);
+
 
   function loadExpenses() {
     fetch('/api/gastos')
@@ -47,15 +49,23 @@ function App() {
   }
 
   // apaga um custo existente disparando para a API um delete
-  function deleteExpense(id) {
-    const confirmDelete = window.confirm('Excluir este gasto?');
-    if (!confirmDelete) return;
+ function deleteExpense(id) {
+  const confirmDelete = window.confirm('Excluir este gasto?');
+  if (!confirmDelete) return;
 
-    fetch(`/api/gastos/${id}`, { method: 'DELETE' }).then(() => {
+  fetch(`/api/gastos/${id}`, { method: 'DELETE' })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Não foi possível excluir o gasto.');
+      }
       loadExpenses();
       loadSummary();
+      setError(null);
+    })
+    .catch(err => {
+      setError(err.message);
     });
-  }
+}
 
   useEffect(() => {
     fetch('/api/categorias')
@@ -106,11 +116,19 @@ function App() {
           body: JSON.stringify(expenseData),
         });
 
-    request.then(() => {
-      cancelEdit();
-      loadExpenses();
-      loadSummary();
-    });
+    request
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Não foi possível salvar o gasto.');
+    }
+    cancelEdit();
+    loadExpenses();
+    loadSummary();
+    setError(null);
+  })
+  .catch(err => {
+    setError(err.message);
+  });
   }
 
   return (
@@ -152,6 +170,9 @@ function App() {
       </section>
 
       <hr className="divider" />
+      {error && (
+        <p className="error-message">{error}</p>
+      )}
 
       <form onSubmit={handleSubmit} className="form-section">
         <h2 className="section-title">Novo lançamento</h2>

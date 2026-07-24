@@ -39,6 +39,16 @@
   margin: 8px 32px;
 }
 
+.error-message {
+  margin: 0 32px 16px;
+  padding: 10px 14px;
+  background: rgba(168, 69, 46, 0.1);
+  color: var(--rust);
+  font-size: 13px;
+  border-left: 3px solid var(--rust);
+}
+
+
 .summary {
   padding: 20px 32px 8px;
 }
